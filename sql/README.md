@@ -1,20 +1,29 @@
-# SQL Analysis
+## Project Files and Data
 
-This folder contains the Microsoft SQL Server (MSSQL) scripts used for the Job Market Intelligence Dashboard project.
+### Dataset
 
-## Main Script
+This project uses the **India Tech Jobs 2024–2026 | Salary & Skills** dataset from Kaggle, created by Sridip Basu.
 
-`IndiaTechJobMarket_Project.sql`
+The dataset creator describes the records as simulated data. Therefore, the results in this project should be interpreted as findings from a simulated dataset, not as independently verified statistics about India's actual technology job market.
 
-The master script contains Sections 1–29 covering data validation, cleaning and business analysis queries.
+The dataset covers June 2024 through April 2026:
+- 2024: June–December
+- 2025: January–December
+- 2026: January–April
 
-## Prerequisites
+### Data Files
 
-- Microsoft SQL Server
-- SQL Server Management Studio (SSMS)
-- The project database and staging table configured as required by the script
+- [Original Kaggle dataset](data/raw/india_job_market_2024_2026.csv)
+- [Cleaned dataset](data/cleaned/india_job_market_cleaned_v2.csv)
+- [Processed dataset](data/processed/india_job_market_final_pre_sql_v1.csv)
 
-## Execution
+### SQL Analysis
 
-Review the script's database and table prerequisites before execution. Run the sections in order and validate the results against the project CSV files.
-The script was developed in a local SQL Server environment. Database names, table names and setup steps may need to be adjusted when reproducing the project on another computer.
+The project uses Microsoft SQL Server (MSSQL) for data validation, cleaning and business analysis.
+
+- [Master SQL script — Sections 1–29](sql/IndiaTechJobMarket_Project.sql)
+- [SQL documentation and prerequisites](sql/README.md)
+
+### Power BI Dashboard
+
+The repository includes the Power BI report, PDF export and dashboard screenshots. Open the PBIX file using Power BI Desktop to inspect the report.
