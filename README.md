@@ -45,7 +45,7 @@ flowchart TD
     E --> F["dbo.Jobs_Staging<br/>Text-based staging table"]
     F --> G["Master SQL script<br/>Validation and type conversion"]
     G --> H["dbo.Jobs_Clean<br/>Typed dates and numeric fields"]
-    H --> I["SQL business-analysis queries<br/>Sections 11–29"]
+    H --> I["SQL business-analysis queries<br/>Sections 11–30"]
     H --> J["Power BI Desktop<br/>Local SQL Server connection"]
     J --> K["DAX measures, slicers and visuals"]
     K --> L["Page 1<br/>Macro Market Overview"]
@@ -88,9 +88,9 @@ The original source is retained separately. The prepared CSVs should be interpre
 
 ## SQL Analysis
 
-The master MSSQL script contains Sections 1–29. It includes staging-data checks, missing-value and data-type validation, date-range checks, creation/reloading of the clean table, and business-analysis queries.
+The master MSSQL script contains Sections 1–30. It includes staging-data checks, missing-value and data-type validation, date-range checks, creation/reloading of the clean table, and business-analysis queries.
 
-- [Master SQL script — Sections 1–29](sql/IndiaTechJobMarket_Project.sql)
+- [Master SQL script — Sections 1–30](sql/IndiaTechJobMarket_Project.sql)
 - [SQL documentation and prerequisites](sql/README.md)
 
 The script uses the `IndiaTechJobMarket` database and expects `dbo.Jobs_Staging` to be populated before it is run. It creates `dbo.Jobs_Clean` if needed and Section 10 truncates and reloads `dbo.Jobs_Clean`. Run it only in the intended project database, and back up any data that must be preserved.
