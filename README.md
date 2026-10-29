@@ -1,137 +1,200 @@
 # Job Market & Compensation Intelligence Dashboard (2024–2026)
 
-## Executive Summary
+A two-page Power BI dashboard supported by Microsoft SQL Server (MSSQL) analysis. The project explores hiring volumes, applicants per opening, salary distributions, experience-level demand, workplace modes, and company ratings using a Kaggle dataset of 5,000 simulated technology-job records.
 
-An end-to-end business intelligence project exploring hiring patterns, applicant-to-opening ratios, and salary distributions using 5,000 simulated technology-job records from a Kaggle dataset.
+> **Data limitation:** The dataset creator describes these records as simulated. Findings in this project describe patterns in this dataset; they should not be presented as independently verified statistics about India's actual technology job market.
 
-Built using Microsoft SQL Server (MSSQL), Power BI, DAX, and a custom dark dashboard theme (`#0B111E`).
+**Tools:** Microsoft SQL Server (MSSQL), SQL, Power BI Desktop, DAX, CSV
 
-**Important data limitation:** The dataset creator describes the records as simulated. The results in this project describe patterns in this dataset; they are not independently verified statistics about India's actual technology job market.
+**Dataset coverage:** June 2024–April 2026
 
-**Data coverage**
-- 2024: June–December
-- 2025: January–December
-- 2026: January–April
+- **2024:** June–December
+- **2025:** January–December
+- **2026:** January–April
 
-Source: [India Tech Jobs 2024–2026 | Salary & Skills — Kaggle](https://www.kaggle.com/datasets/sridipbasu/india-tech-jobs-2024-2026-salary-and-skills)
+**Source:** [India Tech Jobs 2024–2026 | Salary & Skills — Kaggle](https://www.kaggle.com/datasets/sridipbasu/india-tech-jobs-2024-2026-salary-and-skills), by Sridip Basu. The source page describes the records as simulated and lists an MIT licence for the dataset.
 
 ---
 
-## Dashboard Architecture
+## Dashboard Preview
 
-### Page 1: Macro Market Overview
+### Page 1 — Macro Market Overview
 
-Explores job-opening trends over time, experience-level demand, industries, and workplace-mode distributions.
+Hiring/opening trends across the available dates, openings by industry, demand by experience level, workplace-mode distribution, and salary-band distribution.
 
 ![Page 1: Macro Market Overview](page_1_overview.png)
 
-### Page 2: Compensation & Talent Competition
+### Page 2 — Compensation & Talent Competition
 
-Explores salary distributions, applicant-to-opening ratios, company categories, and location-based compensation patterns.
+Average salary measures, total applications, aggregate applicants per opening, the Top 8 industries by applicants per opening, the Top 8 industries by average company rating, and salary comparisons by location, job type, and company type.
 
-![Page 2: Compensation & Competition](page_2_compensation_competition.png)
+![Page 2: Compensation & Competition](page_2_compensation_competition.jpg)
 
 ---
 
-## Analytical Problems Addressed
+## Project Architecture & Data Flow
 
-### 1. Comparing Incomplete Calendar Years
+The workflow is a local, manually prepared analytics process—not an automatically scheduled data pipeline.
 
-**Problem:** The dataset does not contain complete calendar years for 2024 and 2026. Comparing a partial year against a full year can create misleading conclusions.
+```mermaid
+flowchart TD
+    A["Kaggle source<br/>5,000 simulated records"] --> B["Original CSV<br/>data/raw/"]
+    B --> C["Cleaned CSV<br/>data/cleaned/"]
+    C --> D["Processed CSV<br/>data/processed/<br/>Derived analysis and skill flags"]
+    D --> E["Import into local SQL Server<br/>IndiaTechJobMarket"]
+    E --> F["dbo.Jobs_Staging<br/>Text-based staging table"]
+    F --> G["Master SQL script<br/>Validation and type conversion"]
+    G --> H["dbo.Jobs_Clean<br/>Typed dates and numeric fields"]
+    H --> I["SQL business-analysis queries<br/>Sections 11–29"]
+    H --> J["Power BI Desktop<br/>Local SQL Server connection"]
+    J --> K["DAX measures, slicers and visuals"]
+    K --> L["Page 1<br/>Macro Market Overview"]
+    K --> M["Page 2<br/>Compensation & Talent Competition"]
+```
 
-**Approach:** Compare equivalent calendar periods wherever data is available. For example, January–April 2026 is compared with January–April 2025. Comparisons using different numbers of months should not be treated as like-for-like.
+### Repository structure
 
-For this dataset, total openings fell from 3,052 in January–April 2025 to 2,817 in January–April 2026, a decrease of approximately 7.7%.
-
-This is a result within the simulated dataset, not evidence by itself of a real-world hiring-market contraction. The year-slicer DAX measure requires validation for all supported year selections before its results are treated as final.
-
-### 2. Normalising Applicant and Opening Counts
-
-**Problem:** Total applications and total openings have different scales, making raw counts difficult to use for comparing competition across industries.
-
-**Approach:** Use an aggregate applicants-per-opening ratio:
-
-`Total Applications / Total Openings`
-
-For the current dataset:
-- Total applications: 1,510,360
-- Total openings: 18,213
-- Aggregate applicants per opening: approximately 82.93
-
-This aggregate ratio is calculated as total applications divided by total openings. It is not the average of the individual row-level ratios.
-
-Industry rankings should be validated against all eligible industries before their final values are reported.
-
-### 3. Compensation Comparisons
-
-**Problem:** Salary averages can obscure the effect of a skewed salary distribution, and inconsistent location labels can affect comparisons.
-
-**Approach:** Examine mean and median salary alongside location and company categories. Treat group-level differences as descriptive observations rather than evidence of causation.
-
-Initial dataset statistics:
-- Mean salary: 19.83 LPA
-- Median salary: 13.60 LPA
-
-The median is useful because it represents the middle observation and is less affected by extreme salaries than the mean.
-
-A data-quality check also identified 725 records where `city = Remote` while `work_mode` is `On-Site` or `Hybrid`. Remote-work comparisons should be treated cautiously until these conflicting labels have been investigated.
+```text
+.
+├── data/
+│   ├── raw/          # Original Kaggle CSV
+│   ├── cleaned/      # Cleaned CSV
+│   └── processed/    # Processed CSV with derived fields
+├── sql/
+│   ├── IndiaTechJobMarket_Project.sql
+│   └── README.md
+├── Job_Market_Analysis_Dashboard_.pbix
+├── Job_Market_Analysis_Dashboard_.pdf
+├── page_1_overview.png
+├── page_2_compensation_competition.jpg
+└── README.md
+```
 
 ---
 
 ## Data Files
 
-The repository separates the original data from the cleaned and processed versions.
+The repository keeps the source and prepared CSV files separate so the stages can be reviewed independently.
 
-- [Original Kaggle dataset](data/raw/india_job_market_2024_2026.csv)
-- [Cleaned dataset](data/cleaned/india_job_market_cleaned_v2.csv)
-- [Processed dataset](data/processed/india_job_market_final_pre_sql_v1.csv)
+| File | Purpose |
+|---|---|
+| [Original Kaggle dataset](data/raw/india_job_market_2024_2026.csv) | Original source CSV (17 columns) |
+| [Cleaned dataset](data/cleaned/india_job_market_cleaned_v2.csv) | Prepared dataset with date components, applicant-to-opening ratio, and salary band (22 columns) |
+| [Processed dataset](data/processed/india_job_market_final_pre_sql_v1.csv) | Processed dataset with additional skill-category flags (27 columns) |
 
-The original dataset is retained separately so that the preparation workflow can be reviewed. The cleaned and processed files are separate project outputs; their transformations should be documented and validated against the SQL workflow.
+The original source is retained separately. The prepared CSVs should be interpreted as project outputs, not as independently verified real job listings.
 
 ---
 
 ## SQL Analysis
 
-Microsoft SQL Server (MSSQL) was used for data validation, cleaning, and business-analysis queries.
+The master MSSQL script contains Sections 1–29. It includes staging-data checks, missing-value and data-type validation, date-range checks, creation/reloading of the clean table, and business-analysis queries.
 
 - [Master SQL script — Sections 1–29](sql/IndiaTechJobMarket_Project.sql)
 - [SQL documentation and prerequisites](sql/README.md)
 
-The master script assumes the required database and staging table have been configured. Review the prerequisites and execute the sections in order when reproducing the project.
+The script uses the `IndiaTechJobMarket` database and expects `dbo.Jobs_Staging` to be populated before it is run. It creates `dbo.Jobs_Clean` if needed and Section 10 truncates and reloads `dbo.Jobs_Clean`. Run it only in the intended project database, and back up any data that must be preserved.
 
-The SQL files are provided for inspection; the complete workflow should be tested in a separate SQL Server environment before being described as fully reproducible.
-
----
-
-## Power BI and DAX
-
-The Power BI report includes two dashboard pages, KPI cards, comparative measures, and charts for hiring, competition, and compensation analysis.
-
-The year-over-year hiring comparison is intended to use equivalent available calendar periods. The existing DAX measure must be tested against 2024, 2025, and 2026 slicer selections before it is treated as final.
-
-The PBIX report uses a local SQL Server connection. Refreshing the report on another computer may require updating the connection and configuring the database.
+The Power BI file uses a local SQL Server connection. Reproducing the report on another computer may require importing the data, configuring the database, and updating the data-source connection.
 
 ---
 
-## Tools Used
+## Key Metrics
 
-- **Microsoft SQL Server (MSSQL):** Data validation, cleaning, and analysis queries
-- **Power BI Desktop:** Dashboard design and visual analysis
-- **DAX:** Measures and time-period comparisons
-- **CSV:** Source, cleaned, and processed datasets
+The following values were checked against the local SQL Server `dbo.Jobs_Clean` table with read-only queries.
+
+| Metric | Result |
+|---|---:|
+| Job records | 5,000 |
+| Total applications | 1,510,360 |
+| Total openings | 18,213 |
+| Mean salary | 19.83 LPA |
+| Median salary | 13.60 LPA |
+| Aggregate applicants per opening | 82.93 |
+
+**Definition:** Aggregate applicants per opening is calculated as `SUM(applicants) / SUM(openings)`. It is not the unweighted average of row-level applicants-per-opening ratios.
+
+### Comparable-period opening changes
+
+Because the dataset has incomplete calendar years, comparisons use overlapping available months:
+
+- **2024:** Returns no year-over-year value because 2023 data is not available.
+- **2025:** June–December 2025 compared with June–December 2024; the Power BI measure displayed **−6.1%**.
+- **2026:** January–April 2026 compared with January–April 2025. Openings decreased from 3,052 to 2,817, a **−7.7%** change in this dataset.
+
+With all years selected, the KPI uses the latest available year (2026) and therefore displays the January–April comparison. These are changes within the simulated data, not evidence by themselves of a real-world hiring-market contraction.
+
+### Applicants per opening by industry
+
+The ratios below were calculated in SQL Server as total applications divided by total openings for each industry. The dashboard displays the Top 8 and rounds the labels for readability.
+
+| Rank | Industry | Applicants per opening |
+|---:|---|---:|
+| 1 | Manufacturing | 89.77 |
+| 2 | Gaming | 89.52 |
+| 3 | Retail | 87.64 |
+| 4 | Media & Entertainment | 85.37 |
+| 5 | EdTech | 85.20 |
+| 6 | Logistics | 85.13 |
+| 7 | Banking & Finance | 83.78 |
+| 8 | E-Commerce | 82.65 |
+
+Information Technology has the highest total opening volume in the dataset, but not the highest applicants-per-opening ratio. These are different measures and answer different questions.
+
+### Salary comparisons by category
+
+| Category | Mean salary (LPA) |
+|---|---:|
+| **Company type** | |
+| Indian Unicorn | 24.62 |
+| Startup | 21.52 |
+| MNC | 18.45 |
+| PSU/Govt | 10.75 |
+| **Location tier** | |
+| Tier 1 | 19.96 |
+| Remote | 19.86 |
+| Tier 2 | 19.46 |
+| **Job type** | |
+| Contract | 22.00 |
+| Part-Time | 21.91 |
+| Full-Time | 21.68 |
+| Internship | 2.19 |
+
+Indian Unicorns' mean salary is approximately **33.4% higher** than the MNC mean in this simulated dataset. This is a descriptive difference, not proof of a causal effect or a verified real-world salary premium.
 
 ---
 
-## Limitations
+## Data-Quality Checks and Limitations
 
-- The dataset contains simulated records and should not be treated as a verified census of actual Indian technology jobs.
-- The available dates cover June 2024 through April 2026, not complete calendar years for 2024 and 2026.
-- Conflicting location and work-mode labels require further investigation.
-- Comparisons are descriptive and do not establish causation or statistical significance.
-- The DAX year-slicer logic and full SQL-to-Power BI refresh workflow require validation.
+Read-only checks performed against `dbo.Jobs_Clean` found:
+
+- 5,000 rows in each of `dbo.Jobs`, `dbo.Jobs_Staging`, and `dbo.Jobs_Clean`.
+- No duplicate `job_id` values in `dbo.Jobs_Clean`.
+- No missing values in the checked critical fields: job ID, industry, salary, openings, applicants, posting date, and work mode.
+- No year/month mismatches against `date_posted` and no negative salary, openings, or applicants values.
+
+The checks do not prove that every field is correct or that the dataset represents actual market conditions. Additional limitations were identified:
+
+- **Location/work-mode conflicts:** 1,992 records have `city = Remote`. Of these, 1,267 have `work_mode = Remote`, while 376 are `On-Site` and 349 are `Hybrid`. The 725 conflicting records were retained without guessing which label was correct. Location/work-mode comparisons should be interpreted cautiously.
+- **Company/industry mappings:** A SQL check found each of the 53 company labels associated with 11–15 distinct industries. This unusually broad mapping limits how literally company- and industry-level results should be interpreted.
+- **Simulated source:** The records are simulated, not a verified census of real job advertisements. The trends and comparisons are for analytical-method demonstrations.
+- **Incomplete time coverage:** 2024 contains June–December only; 2026 contains January–April only. Use equivalent periods for comparisons.
+- **Descriptive analysis:** Group averages and ratios do not establish causation or statistical significance.
+- **Local dependency:** The PBIX uses a local SQL Server connection; refreshes on another computer require setup and connection changes.
+
+The year-slicer measure was tested in the local Power BI report for the available year selections. The complete SQL-to-Power BI refresh workflow has not been independently tested on a fresh computer.
+
+---
+
+## Files
+
+- [Power BI report (PBIX)](Job_Market_Analysis_Dashboard_.pbix)
+- [Two-page dashboard PDF](Job_Market_Analysis_Dashboard_.pdf)
+- [Page 1 screenshot](page_1_overview.png)
+- [Page 2 screenshot](page_2_compensation_competition.jpg)
+- [Master SQL script](sql/IndiaTechJobMarket_Project.sql)
+- [SQL instructions](sql/README.md)
 
 ## License and Attribution
 
-Dataset source: [Sridip Basu — India Tech Jobs 2024–2026 | Salary & Skills on Kaggle](https://www.kaggle.com/datasets/sridipbasu/india-tech-jobs-2024-2026-salary-and-skills).
-
-Retain appropriate attribution and comply with the dataset's applicable licence terms. The project code and documentation are separate from the dataset's licensing terms.
+Dataset source: [Sridip Basu — India Tech Jobs 2024–2026 | Salary & Skills on Kaggle](https://www.kaggle.com/datasets/sridipbasu/india-tech-jobs-2024-2026-salary-and-skills). The source page lists an MIT licence for the dataset; retain attribution and consult the source page for its applicable terms. This does not automatically define the licence for the Power BI report or the rest of this project.
