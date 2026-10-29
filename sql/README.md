@@ -1,29 +1,37 @@
-## Project Files and Data
+# SQL Analysis
 
-### Dataset
+This folder contains the Microsoft SQL Server (MSSQL) master script used in the Job Market Intelligence Dashboard project.
 
-This project uses the **India Tech Jobs 2024–2026 | Salary & Skills** dataset from Kaggle, created by Sridip Basu.
+## Master Script
 
-The dataset creator describes the records as simulated data. Therefore, the results in this project should be interpreted as findings from a simulated dataset, not as independently verified statistics about India's actual technology job market.
+**File:** `IndiaTechJobMarket_Project.sql`
 
-The dataset covers June 2024 through April 2026:
-- 2024: June–December
-- 2025: January–December
-- 2026: January–April
+The script contains Sections 1–29, covering:
+- Staging-data validation and missing-value checks
+- Numeric and date validation
+- Creation and loading of the clean table
+- Job-market, salary, skills and competition analysis
+- Business queries for exploring the dataset
 
-### Data Files
+## Prerequisites
 
-- [Original Kaggle dataset](data/raw/india_job_market_2024_2026.csv)
-- [Cleaned dataset](data/cleaned/india_job_market_cleaned_v2.csv)
-- [Processed dataset](data/processed/india_job_market_final_pre_sql_v1.csv)
+- Microsoft SQL Server
+- SQL Server Management Studio (SSMS)
+- A database named `IndiaTechJobMarket`
+- A populated `dbo.Jobs_Staging` table with the required columns
 
-### SQL Analysis
+The master script assumes the database and staging table already exist. It is not a complete database setup script.
 
-The project uses Microsoft SQL Server (MSSQL) for data validation, cleaning and business analysis.
+## How to Run
 
-- [Master SQL script — Sections 1–29](sql/IndiaTechJobMarket_Project.sql)
-- [SQL documentation and prerequisites](sql/README.md)
+1. Open `IndiaTechJobMarket_Project.sql` in SSMS.
+2. Confirm that the database and staging table are configured correctly.
+3. Review the script and execute its sections in order.
+4. Inspect the output of the validation queries.
+5. Verify the analysis results against the project datasets.
 
-### Power BI Dashboard
+**Important:** Section 10 truncates and reloads `dbo.Jobs_Clean`. Run the script only in your intended project database, and back up any data you need to preserve.
 
-The repository includes the Power BI report, PDF export and dashboard screenshots. Open the PBIX file using Power BI Desktop to inspect the report.
+## Reproducibility
+
+The script was developed against a local SQL Server environment. Database setup and data import may need to be performed separately before running it on another computer.
