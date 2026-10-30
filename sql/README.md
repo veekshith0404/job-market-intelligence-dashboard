@@ -39,7 +39,7 @@ The Power BI report was developed using a local SQL Server Express instance.
 To use the report on another computer:
 
 1. Install and configure Microsoft SQL Server.
-2. Import the project data and prepare the required database and clean table.
+2. Create the `IndiaTechJobMarket` database and populate `dbo.Jobs_Staging` with the required project data. Then execute `IndiaTechJobMarket_Project.sql` in SSMS to validate the data and create and load `dbo.Jobs_Clean`..
 3. Open the PBIX file in Power BI Desktop.
 4. Go to **File → Options and settings → Data source settings**.
 5. Select the SQL Server connection and choose **Change Source**.
